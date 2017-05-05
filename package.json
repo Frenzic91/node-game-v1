@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Frenzic91/node-game-v1/issues"
   },
-  "homepage": "https://github.com/Frenzic91/node-game-v1#readme"
+  "homepage": "https://github.com/Frenzic91/node-game-v1#readme",
+  "dependencies": {
+    "socket.io": "^1.7.3"
+  }
 }
