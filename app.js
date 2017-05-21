@@ -1,14 +1,25 @@
+var port = process.env.PORT || 3000
+
 var express = require('express')
 var app = express()
+var server = app.listen(port, function () {
+  console.log('Server is running on port ' + port + '...')
+})
+var io = require('socket.io').listen(server)
+
+var Game = require('./src/Game.js')
+var Player = require('./src/Player.js')
+var Map = require('./src/Map.js')
+var Entity = require('./src/Entity.js')
+var Bullet = require('./src/Bullet.js')
 
 app.set('view engine', 'ejs')
 
-var port = process.env.PORT || 3000
+app.use('/public', express.static(__dirname + '/public'))
 
 app.get('/', function (req, res) {
   res.render('index')
 })
 
-app.listen(port, function () {
-  console.log('Server is running on port ' + port + '...')
-})
+var GameInstance = new Game()
+GameInstance.registerEventListeners(io)

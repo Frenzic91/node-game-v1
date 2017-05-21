@@ -1,8 +1,17 @@
 <html>
     <head>
-        <canvas id="gameCanvas" width="800" height="600" style="border:1px solid #000000;"></canvas>
+        <canvas id="gameCanvas" width="800" height="600" tabindex="0" style="border:1px solid #000000;"></canvas>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/public/Constants.js"></script>
+        <script src="/public/Entity.js"></script>
+        <script src="/public/Player.js"></script>
+        <script src="/public/Bullet.js"></script>
+        <script src="/public/Map.js"></script>
+        <script src="/public/Game.js"></script>
+        <script>
+            var socket = io();
+        </script>
     </head>
     <body>
-
     </body>
 </html>
