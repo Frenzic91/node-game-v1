@@ -12,6 +12,7 @@ var Player = require('./src/Player.js')
 var Map = require('./src/Map.js')
 var Entity = require('./src/Entity.js')
 var Bullet = require('./src/Bullet.js')
+var EventHandler = require('./src/EventHandler.js')
 
 app.set('view engine', 'ejs')
 
@@ -22,4 +23,8 @@ app.get('/', function (req, res) {
 })
 
 var GameInstance = new Game()
-GameInstance.registerEventListeners(io)
+var EvntHndlr = new EventHandler()
+
+EvntHndlr.RegisterListeners(io)
+
+// run server game loop

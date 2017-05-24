@@ -5,3 +5,5 @@ var Constants = {
   S: 83,
   D: 68
 }
+
+module.exports = Constants
