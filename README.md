@@ -1,2 +1,2 @@
 # node-game-v1
-Game made using the NodeJS framework
+A multiplayer game made using the NodeJS framework
