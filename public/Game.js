@@ -45,19 +45,19 @@ class Game {
           // figure out which key was pressed
     switch (e.keyCode) {
       case (Constants.W):
-        game.Player.y -= 10
+        // game.Player.y -= 10
         socket.emit('move', {Sock: socket.id, Key: e.keyCode})
         break
       case (Constants.A):
-        game.Player.x -= 10
+        // game.Player.x -= 10
         socket.emit('move', {Sock: socket.id, Key: e.keyCode})
         break
       case (Constants.S):
-        game.Player.y += 10
+        // game.Player.y += 10
         socket.emit('move', {Sock: socket.id, Key: e.keyCode})
         break
       case (Constants.D):
-        game.Player.x += 10
+        // game.Player.x += 10
         socket.emit('move', {Sock: socket.id, Key: e.keyCode})
         break
     }
@@ -94,10 +94,15 @@ socket.on('getConnectedPlayers', function (Data) {
 
 // how client should respond to other players moving
 socket.on('move', function (Data) {
-  var movedPlayer = game.FindPlayerByID(Data.SockID, false)
+  if (Data.SockID === game.Player.ID) {
+    game.Player.x = Data.x
+    game.Player.y = Data.y
+  } else {
+    var movedPlayer = game.FindPlayerByID(Data.SockID, false)
 
-  movedPlayer.x = Data.x
-  movedPlayer.y = Data.y
+    movedPlayer.x = Data.x
+    movedPlayer.y = Data.y
+  }
 })
 
 function draw () {
@@ -105,12 +110,12 @@ function draw () {
 
   // draw self
   ctx.fillStyle = '#000000'
-  ctx.fillRect(game.Player.x, game.Player.y, 20, 20)
+  ctx.fillRect(game.Player.x, game.Player.y, 50, 50)
 
   // draw others
   ctx.fillStyle = '#ff6dea'
   game.remotePlayers.forEach(function (PlayerElement, Index, Array) {
-    ctx.fillRect(PlayerElement.x, PlayerElement.y, 20, 20)
+    ctx.fillRect(PlayerElement.x, PlayerElement.y, 50, 50)
   })
 }
 

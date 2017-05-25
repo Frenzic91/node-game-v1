@@ -40,11 +40,24 @@ class Game {
   GetPlayersJSON () {
     var PlayersJSON = []
 
-    this.Players.forEach(function (Player, Index, Array) {
-      PlayersJSON.push({ID: Player.getID(), x: Player.getX(), y: Player.getY()})
+    this.Players.forEach(function (PlayerElement, Index, Array) {
+      PlayersJSON.push({ID: PlayerElement.getID(), x: PlayerElement.getX(), y: PlayerElement.getY()})
     })
 
     return PlayersJSON
+  }
+
+  detectCollisionWith (Player) {
+    var collisionDetected = false
+
+    this.Players.forEach(function (PlayerElement, Index, Array) {
+      if (Player.ID !== PlayerElement.ID &&
+          Player.collidesWith(PlayerElement)) {
+        collisionDetected = true
+      }
+    })
+
+    return collisionDetected
   }
 }
 

@@ -11,25 +11,47 @@ class EventHandler {
     var GameInstance = new Game()  // get singleton
     var Player = GameInstance.FindPlayerByID(Data.Sock, false)
 
+    var moveAxis
+    var oldValue
+
     switch (Data.Key) {
       case (Constants.W):
-        Player.setY(Player.getY() - 10)
+        oldValue = Player.setY(Player.getY() - 10)
+        moveAxis = 'y'
+
         break
 
       case (Constants.A):
-        Player.setX(Player.getX() - 10)
+        oldValue = Player.setX(Player.getX() - 10)
+        moveAxis = 'x'
+
         break
 
       case (Constants.S):
-        Player.setY(Player.getY() + 10)
+        oldValue = Player.setY(Player.getY() + 10)
+        moveAxis = 'y'
+
         break
 
       case (Constants.D):
-        Player.setX(Player.getX() + 10)
+        oldValue = Player.setX(Player.getX() + 10)
+        moveAxis = 'x'
+
         break
     }
 
-    this.broadcast.emit('move', {SockID: Data.Sock, x: Player.getX(), y: Player.getY()})
+    if (GameInstance.detectCollisionWith(Player)) {
+      // revert position change
+      if (moveAxis === 'x') {
+        Player.setX(oldValue)
+      } else {
+        Player.setY(oldValue)
+      }
+    } else {
+      // no collision, player moved successfully
+      this.emit('move', {SockID: Data.Sock, x: Player.getX(), y: Player.getY()})
+      this.broadcast.emit('move', {SockID: Data.Sock, x: Player.getX(), y: Player.getY()})
+    }
   }
 
   HandlePlayerDisconnect () {
