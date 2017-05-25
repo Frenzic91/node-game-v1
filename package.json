@@ -1,11 +1,11 @@
 {
   "name": "node-game-v1",
   "version": "1.0.0",
-  "description": "A game made using the nodejs framework (Version 1)",
-  "main": "server.js",
+  "description": "A multiplayer game made using the NodeJS framework (Version 1)",
+  "main": "GameServer.js",
   "scripts": {
     "test": "standard && mocha",
-    "start": "nodemon app.js"
+    "start": "nodemon GameServer.js"
   },
   "repository": {
     "type": "git",

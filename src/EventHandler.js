@@ -3,54 +3,48 @@ var Game = require('./Game')
 var Constants = require('./Constants')
 
 class EventHandler {
-  constructor () {
+  constructor () {}
 
-  }
-
-  HandlePlayerMove (Data) {
+  HandlePlayerMove (MoveData) {
     var GameInstance = new Game()  // get singleton
-    var Player = GameInstance.FindPlayerByID(Data.Sock, false)
+    var MovingPlayer = GameInstance.FindPlayerByID(MoveData.PlayerID, false)
 
-    var moveAxis
-    var oldValue
+    // used to revert changes to player position in case of a collision
+    var moveAxis, oldValue
 
-    switch (Data.Key) {
+    switch (MoveData.KeyPress) {
       case (Constants.W):
-        oldValue = Player.setY(Player.getY() - 10)
+        oldValue = MovingPlayer.setY(MovingPlayer.getY() - Constants.MoveDistanceInPixels)
         moveAxis = 'y'
-
         break
 
       case (Constants.A):
-        oldValue = Player.setX(Player.getX() - 10)
+        oldValue = MovingPlayer.setX(MovingPlayer.getX() - Constants.MoveDistanceInPixels)
         moveAxis = 'x'
-
         break
 
       case (Constants.S):
-        oldValue = Player.setY(Player.getY() + 10)
+        oldValue = MovingPlayer.setY(MovingPlayer.getY() + Constants.MoveDistanceInPixels)
         moveAxis = 'y'
-
         break
 
       case (Constants.D):
-        oldValue = Player.setX(Player.getX() + 10)
+        oldValue = MovingPlayer.setX(MovingPlayer.getX() + Constants.MoveDistanceInPixels)
         moveAxis = 'x'
-
         break
     }
 
-    if (GameInstance.detectCollisionWith(Player)) {
+    if (GameInstance.detectCollisionWith(MovingPlayer)) {
       // revert position change
       if (moveAxis === 'x') {
-        Player.setX(oldValue)
+        MovingPlayer.setX(oldValue)
       } else {
-        Player.setY(oldValue)
+        MovingPlayer.setY(oldValue)
       }
     } else {
       // no collision, player moved successfully
-      this.emit('move', {SockID: Data.Sock, x: Player.getX(), y: Player.getY()})
-      this.broadcast.emit('move', {SockID: Data.Sock, x: Player.getX(), y: Player.getY()})
+      this.emit('move', {PlayerID: MovingPlayer.getID(), x: MovingPlayer.getX(), y: MovingPlayer.getY()})
+      this.broadcast.emit('move', {PlayerID: MovingPlayer.getID(), x: MovingPlayer.getX(), y: MovingPlayer.getY()})
     }
   }
 
@@ -60,19 +54,19 @@ class EventHandler {
     var GameInstance = new Game() // get singleton
     GameInstance.RemovePlayer(this.id)
 
-    this.broadcast.emit('removePlayer', {ID: this.id})
+    this.broadcast.emit('removePlayer', {PlayerID: this.id})
   }
 
   HandlePlayerConnect (Socket) {
     console.log('a user has connected')
 
     var GameInstance = new Game()  // get singleton
-    var NewPlayer = new Player(Socket.id, 400, 300)
+    var NewPlayer = new Player(Socket.id, Constants.PlayerStartPositionX, Constants.PlayerStartPositionY)
 
     Socket.on('move', this.HandlePlayerMove)
     Socket.on('disconnect', this.HandlePlayerDisconnect)
 
-    Socket.broadcast.emit('newPlayer', {ID: Socket.id, x: 400, y: 300})
+    Socket.broadcast.emit('newPlayer', {PlayerID: NewPlayer.getID(), x: NewPlayer.getX(), y: NewPlayer.getY()})
     Socket.emit('getConnectedPlayers', GameInstance.GetPlayersJSON())
 
     GameInstance.AddPlayer(NewPlayer)

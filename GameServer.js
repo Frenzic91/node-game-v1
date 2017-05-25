@@ -23,8 +23,8 @@ app.get('/', function (req, res) {
 })
 
 var GameInstance = new Game()
-var EvntHndlr = new EventHandler()
+var EventHandlerInstance = new EventHandler()
 
-EvntHndlr.RegisterListeners(io)
+EventHandlerInstance.RegisterListeners(io)
 
 // run server game loop

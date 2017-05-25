@@ -24,12 +24,12 @@ class Game {
   FindPlayerByID (ID, ReturnIndex) {
     var ReturnValue
 
-    this.Players.forEach(function (Player, PlayerIndex, Array) {
-      if (Player.getID() === ID) {
+    this.Players.forEach(function (PlayerEntry, PlayerIndex, Array) {
+      if (PlayerEntry.getID() === ID) {
         if (ReturnIndex) {
           ReturnValue = PlayerIndex
         } else {
-          ReturnValue = Player
+          ReturnValue = PlayerEntry
         }
       }
     })
@@ -40,8 +40,8 @@ class Game {
   GetPlayersJSON () {
     var PlayersJSON = []
 
-    this.Players.forEach(function (PlayerElement, Index, Array) {
-      PlayersJSON.push({ID: PlayerElement.getID(), x: PlayerElement.getX(), y: PlayerElement.getY()})
+    this.Players.forEach(function (PlayerEntry, PlayerIndex, Array) {
+      PlayersJSON.push({PlayerID: PlayerEntry.getID(), x: PlayerEntry.getX(), y: PlayerEntry.getY()})
     })
 
     return PlayersJSON
@@ -50,9 +50,9 @@ class Game {
   detectCollisionWith (Player) {
     var collisionDetected = false
 
-    this.Players.forEach(function (PlayerElement, Index, Array) {
-      if (Player.ID !== PlayerElement.ID &&
-          Player.collidesWith(PlayerElement)) {
+    this.Players.forEach(function (PlayerEntry, PlayerIndex, Array) {
+      if (Player.ID !== PlayerEntry.ID &&
+          Player.collidesWith(PlayerEntry)) {
         collisionDetected = true
       }
     })
