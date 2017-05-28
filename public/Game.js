@@ -7,26 +7,33 @@ class Game {
     }
 
     this.Player
-    this.remotePlayers = []
+    this.RemotePlayers = []
+    this.Bullets = []
 
     return GameInstance
   }
 
   AddPlayer (Player) {
-    this.remotePlayers.push(Player)
+    this.RemotePlayers.push(Player)
   }
 
   RemovePlayer (PlayerID) {
     var PlayerIndex = this.FindPlayerByID(PlayerID, true)
-    console.log('PlayerIndex: ' + PlayerIndex)
+    this.RemotePlayers.splice(PlayerIndex, 1)
+  }
 
-    this.remotePlayers.splice(PlayerIndex, 1)
+  AddBullet(Bullet) {
+    this.Bullets.push(Bullet)
+  }
+
+  RemoveBullet(BulletID) {
+    // remove the bullet, typically used on collision with a player
   }
 
   FindPlayerByID (ID, ReturnIndex) {
     var ReturnValue
 
-    this.remotePlayers.forEach(function (PlayerEntry, PlayerIndex, Array) {
+    this.RemotePlayers.forEach(function (PlayerEntry, PlayerIndex, Array) {
       if (PlayerEntry.ID === ID) {
         if (ReturnIndex) {
           ReturnValue = PlayerIndex
@@ -36,27 +43,32 @@ class Game {
       }
     })
 
-    return ReturnValue
+    if (ReturnValue) {
+      return ReturnValue
+    }
+  }
+
+  FindBulletByID (ID) {
+    console.log(ID)
+    var ReturnValue
+
+    this.Bullets.forEach(function (BulletEntry, BulletIndex, Array) {
+      if (BulletEntry.BulletID === ID) {
+        ReturnValue = BulletEntry
+      }
+    })
+
+    if (ReturnValue) {
+      return ReturnValue
+    }
   }
 
   HandleInput (e) {
-          // figure out which key was pressed
-    switch (e.keyCode) {
-      case (Constants.W):
-        //game.Player.y -= 10
-        socket.emit('move', {PlayerID: socket.id, KeyPress: e.keyCode})
-        break
-      case (Constants.A):
-        //game.Player.x -= 10
-        socket.emit('move', {PlayerID: socket.id, KeyPress: e.keyCode})
-        break
-      case (Constants.S):
-        //game.Player.y += 10
-        socket.emit('move', {PlayerID: socket.id, KeyPress: e.keyCode})
-        break
-      case (Constants.D):
-        socket.emit('move', {PlayerID: socket.id, KeyPress: e.keyCode})
-        break
+    if (e.pageX || e.pageY) {
+      socket.emit('shoot', {PlayerID: socket.id, MouseX: e.pageX, MouseY: e.pageY})
+    }
+    if (e.keyCode) {
+      socket.emit('move', {PlayerID: socket.id, KeyPress: e.keyCode})
     }
   }
 }

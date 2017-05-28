@@ -23,8 +23,9 @@ app.get('/', function (req, res) {
 })
 
 var GameInstance = new Game()
-var EventHandlerInstance = new EventHandler()
+var EventHandlerInstance = new EventHandler(io)
 
-EventHandlerInstance.RegisterListeners(io)
+EventHandlerInstance.RegisterListeners()
 
 // run server game loop
+setInterval(GameInstance.Run.bind(GameInstance), 10)

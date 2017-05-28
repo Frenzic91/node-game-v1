@@ -4,7 +4,7 @@ var canvas = document.getElementById('gameCanvas')
 var ctx = canvas.getContext('2d')
 
 canvas.addEventListener('keydown', GameClient.HandleInput, true)
-
+canvas.addEventListener('mousedown', GameClient.HandleInput, true)
 
 // register socket event listeners for the client
 socket.on('connect', function () {
@@ -29,6 +29,23 @@ socket.on('getConnectedPlayers', function (ConnectedPlayersData) {
   }
 })
 
+socket.on('addBullet', function (BulletData) {
+  var NewBullet = new Bullet(BulletData.BulletID, BulletData.x, BulletData.y)
+
+  GameClient.AddBullet(NewBullet)
+})
+
+socket.on('updateBullets', function (BulletsData) {
+  for (var BulletData in BulletsData) {
+    var Bullet = GameClient.FindBulletByID(BulletsData[BulletData].BulletID)
+
+    if (Bullet) {
+      Bullet.setX(BulletsData[BulletData].x)
+      Bullet.setY(BulletsData[BulletData].y)
+    }
+  }
+})
+
 socket.on('move', function (MoveData) {
   if (MoveData.PlayerID === GameClient.Player.ID) {
     GameClient.Player.x = MoveData.x
@@ -44,6 +61,8 @@ socket.on('move', function (MoveData) {
 
 // draw the game
 function DrawGame () {
+  //console.log(GameClient.Bullets)
+
   ctx.clearRect(0, 0, Constants.ViewWidth, Constants.ViewHeight)
 
   // draw self
@@ -52,8 +71,13 @@ function DrawGame () {
 
   // draw others
   ctx.fillStyle = '#ff6dea'
-  GameClient.remotePlayers.forEach(function (PlayerElement, Index, Array) {
+  GameClient.RemotePlayers.forEach(function (PlayerElement, Index, Array) {
     ctx.fillRect(PlayerElement.x, PlayerElement.y, Constants.PlayerWidth, Constants.PlayerHeight)
+  })
+
+  // draw bullets
+  GameClient.Bullets.forEach(function (BulletElement, Index, Array) {
+    ctx.fillRect(BulletElement.x, BulletElement.y, 5, 5)
   })
 }
 

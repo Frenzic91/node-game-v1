@@ -3,6 +3,7 @@ var Entity = require('./Entity')
 class Player extends Entity {
   constructor (ID, x, y) {
     super(x, y)
+
     this.ID = ID
   }
 

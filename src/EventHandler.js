@@ -2,8 +2,17 @@ var Player = require('./Player')
 var Game = require('./Game')
 var Constants = require('./Constants')
 
+let EventHandlerInstance = null
+
 class EventHandler {
-  constructor () {}
+  constructor (IO) {
+    if (! EventHandlerInstance) {
+      this.IO = IO
+      EventHandlerInstance = this
+    }
+
+    return EventHandlerInstance
+  }
 
   HandlePlayerMove (MoveData) {
     var GameInstance = new Game()  // get singleton
@@ -43,9 +52,32 @@ class EventHandler {
       }
     } else {
       // no collision, player moved successfully
+      //console.log(this)
       this.emit('move', {PlayerID: MovingPlayer.getID(), x: MovingPlayer.getX(), y: MovingPlayer.getY()})
       this.broadcast.emit('move', {PlayerID: MovingPlayer.getID(), x: MovingPlayer.getX(), y: MovingPlayer.getY()})
     }
+  }
+
+  HandlePlayerShoot (ShootData) {
+    var GameInstance = new Game()
+
+    // get the player that shot (for their position)
+    var ShootingPlayer = GameInstance.FindPlayerByID(ShootData.PlayerID, false)
+
+    // calculate the moveVector for the bullet
+    var tx = ShootData.MouseX - ShootingPlayer.x
+    var ty = ShootData.MouseY - ShootingPlayer.y
+    //console.log('tx: ' + tx)
+    //console.log('ty: ' + ty)
+
+    var THypotenuse = Math.sqrt(tx * tx + ty * ty)
+
+    var dx = (tx / THypotenuse)
+    var dy = (ty / THypotenuse)
+
+    var BulletID = GameInstance.AddBullet(ShootingPlayer.getX(), ShootingPlayer.getY(), dx, dy)
+
+    this.IO.emit('addBullet', {BulletID: BulletID, x: ShootingPlayer.getX(), y: ShootingPlayer.getY()})
   }
 
   HandlePlayerDisconnect () {
@@ -64,6 +96,7 @@ class EventHandler {
     var NewPlayer = new Player(Socket.id, Constants.PlayerStartPositionX, Constants.PlayerStartPositionY)
 
     Socket.on('move', this.HandlePlayerMove)
+    Socket.on('shoot', this.HandlePlayerShoot.bind(this))
     Socket.on('disconnect', this.HandlePlayerDisconnect)
 
     Socket.broadcast.emit('newPlayer', {PlayerID: NewPlayer.getID(), x: NewPlayer.getX(), y: NewPlayer.getY()})
@@ -72,8 +105,13 @@ class EventHandler {
     GameInstance.AddPlayer(NewPlayer)
   }
 
-  RegisterListeners (IO) {
-    IO.on('connection', this.HandlePlayerConnect.bind(this))
+  SendBulletsUpdate(BulletsJSON) {
+    //console.log('sending bullet update to clients')
+    this.IO.emit('updateBullets', BulletsJSON)
+  }
+
+  RegisterListeners () {
+    this.IO.on('connection', this.HandlePlayerConnect.bind(this))
   }
 }
 
